@@ -62,6 +62,19 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 };
 
+watch(
+  () => props.isVisible,
+  (val) => {
+    if (!import.meta.client) return;
+    if (val) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+  },
+  { immediate: true }
+);
+
 onMounted(() => {
   window.addEventListener("keydown", handleKeydown);
 });
