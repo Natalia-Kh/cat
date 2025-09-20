@@ -1,0 +1,54 @@
+<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <linearGradient y2="100%" x2="100%" y1="0%" x1="0%" id="bodyGradient">
+   <stop stop-color="#ffd89b" offset="0%"/>
+   <stop stop-color="#ff9f68" offset="100%"/>
+  </linearGradient>
+  <linearGradient y2="100%" x2="100%" y1="0%" x1="0%" id="earGradient">
+   <stop stop-color="#ff9f68" offset="0%"/>
+   <stop stop-color="#e87c4d" offset="100%"/>
+  </linearGradient>
+ </defs>
+ <!-- Тело кота -->
+ <!-- Глаза -->
+ <!-- Нос -->
+ <!-- Рот -->
+ <!-- Усы -->
+ <!-- Щёчки -->
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="82" width="82" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <g id="svg_1">
+   <!-- Тело -->
+   <path id="svg_2" stroke-width="1.5" stroke="#e87c4d" fill="url(#bodyGradient)" d="m12,61q20,30 40,0q20,-10 0,-30q-20,-20 -40,0q-20,20 0,30"/>
+   <!-- Уши -->
+   <path id="svg_3" stroke-width="1.5" stroke="#e87c4d" fill="url(#earGradient)" d="m17,16l-10,-15l15,10l-5,5z"/>
+   <path id="svg_4" stroke-width="1.5" stroke="#e87c4d" fill="url(#earGradient)" d="m47,16l10,-15l-15,10l5,5z"/>
+   <!-- Внутренняя часть ушей -->
+   <path id="svg_5" fill="#ffb38a" d="m14,11l-5,-8l11,6l-6,2z"/>
+   <path id="svg_6" fill="#ffb38a" d="m50,11l5,-8l-11,6l6,2z"/>
+   <!-- Хвост -->
+   <path id="svg_7" stroke-width="1.5" stroke="#e87c4d" fill="url(#bodyGradient)" d="m52,61q20,10 25,-10q5,-20 -10,-30q-15,-10 -20,10"/>
+  </g>
+  <circle id="svg_8" stroke-width="1.5" stroke="#2c3e50" fill="#ffffff" r="8" cy="36" cx="22"/>
+  <circle id="svg_9" stroke-width="1.5" stroke="#2c3e50" fill="#ffffff" r="8" cy="36" cx="42"/>
+  <circle id="svg_10" fill="#2c3e50" r="4" cy="36" cx="20"/>
+  <circle id="svg_11" fill="#2c3e50" r="4" cy="36" cx="40"/>
+  <circle id="svg_12" fill="#ffffff" r="1.5" cy="35" cx="19"/>
+  <circle id="svg_13" fill="#ffffff" r="1.5" cy="35" cx="39"/>
+  <path id="svg_14" fill="#ff6b47" d="m30,46l4,0l-2,3l-2,-3z"/>
+  <path id="svg_15" fill="none" stroke-width="1.5" stroke="#ff6b47" d="m32,51q-5,5 -5,8"/>
+  <path id="svg_16" fill="none" stroke-width="1.5" stroke="#ff6b47" d="m32,51q5,5 5,8"/>
+  <line id="svg_17" stroke="#666" y2="46" x2="2" y1="48" x1="17"/>
+  <line id="svg_18" stroke="#666" y2="51" x2="2" y1="51" x1="17"/>
+  <line id="svg_19" stroke="#666" y2="56" x2="2" y1="54" x1="17"/>
+  <line id="svg_20" stroke="#666" y2="46" x2="62" y1="48" x1="47"/>
+  <line id="svg_21" stroke="#666" y2="51" x2="62" y1="51" x1="47"/>
+  <line id="svg_22" stroke="#666" y2="56" x2="62" y1="54" x1="47"/>
+  <circle id="svg_23" opacity="0.6" fill="#ffb38a" r="5" cy="46" cx="12"/>
+  <circle id="svg_24" opacity="0.6" fill="#ffb38a" r="5" cy="46" cx="52"/>
+ </g>
+</svg>
