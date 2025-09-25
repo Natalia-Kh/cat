@@ -10,12 +10,18 @@ export const useImages = () => {
 
     try {
       const imagePromises = Array.from({ length: count }, async () => {
-        const response = await fetch("https://cataas.com/cat");
+        const response = await fetch("/api/images");
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
         const blob = await response.blob();
         return URL.createObjectURL(blob);
       });
-      const results = await Promise.all(imagePromises);
-      images.value = results;
+      const results = await Promise.allSettled(imagePromises);
+      results.forEach((val) => {
+        if (val.status === "fulfilled") {
+          images.value.push(val.value);
+        }
+      });
     } catch (err) {
       error.value =
         err instanceof Error
