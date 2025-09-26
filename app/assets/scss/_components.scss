@@ -21,14 +21,14 @@
   }
 }
 
-.link--color {
-  color: white;
-  background-color: c.$primary-color;
+.link--white {
+  color: c.$text-color;
+  background-color: white;
   border-color: c.$primary-color;
   &:hover {
-    background-color: c.$secondary-color;
-    border-color: c.$secondary-color;
+    background-color: c.$primary-color;
+    border-color: c.$primary-color;
     box-shadow: 2px 2px 4px c.$shadow-secondary-color;
-    color: c.$text-color;
+    color: white;
   }
 }

@@ -116,6 +116,8 @@ onUnmounted(() => {
     max-height: 80vh;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    height: 100%;
+    max-height: 364px;
   }
 
   &-header {
@@ -153,8 +155,8 @@ onUnmounted(() => {
 
   &-content {
     padding: 20px;
-    height: fit-content;
-    overflow-y: auto;
+    height: calc(100% - 156px);
+    overflow-y: scroll;
   }
 
   &-footer {

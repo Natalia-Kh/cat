@@ -1,36 +1,55 @@
 <template>
   <div
+    v-if="!pending"
     ref="stickerrRef"
     class="sticker"
-    :class="{ 'sticker--expanded': isOpen }"
+    :class="{ 'sticker--expanded ': isOpen }"
     @click="handleTriggerClick"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
   >
-    <CatIcon class="sticker__icon" />
-
-    <transition>
-      <div v-show="isOpen" class="sticker__content">
-        <h3>Интересный факт!</h3>
-        <p>
-          Коты чаще всего левши, а кошки – правши.<br />Определить это можно,
-          наблюдая, какой лапой питомец толкает мяч или пытается вытащить
-          кусочки пищи из миски.
-        </p>
-        <button class="link link--color" @click="$emit('showConfirmModal')">
-          Узнать больше
-        </button>
-      </div></transition
+    <h3 v-show="isOpen">Консультация эксперта</h3>
+    <div class="image-grid-stack">
+      <img
+        v-for="(image, index) in data.images"
+        :key="index"
+        :src="image"
+        :alt="`Image ${index + 1}`"
+        loading="lazy"
+      />
+    </div>
+    <transition name="fade">
+      <button
+        v-show="isOpen"
+        class="link link--white"
+        @click="$emit('showConfirmModal')"
+      >
+        Получить консультацию
+      </button></transition
     >
+    <svg
+      v-show="!isOpen"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+    >
+      <path
+        d="M20 12H4M4 12L10 18M4 12L10 6"
+        stroke="#285599"
+        stroke-width="2"
+      />
+    </svg>
   </div>
 </template>
 
 <script setup lang="ts">
-import CatIcon from "~/assets/img/cat.svg";
+const { fetchRandomImages } = useImages();
 const isOpen = ref(false);
 const stickerrRef = ref<HTMLElement | null>(null);
-
 const isMobile = ref(false);
+
+const { data, pending } = fetchRandomImages(3);
 
 onMounted(() => {
   checkDeviceType();
@@ -75,6 +94,9 @@ const close = () => {
 </script>
 
 <style scoped lang="scss">
+$img-size: 80px;
+$img-bias: 24px;
+
 .v-enter-active {
   transition: opacity 0.5s ease-out;
 }
@@ -91,78 +113,129 @@ const close = () => {
 .v-enter-to {
   opacity: 1;
 }
+.fade-leave-active {
+  transition-duration: 0ms;
+  transition-timing-function: ease-out;
+}
+.fade-enter-active {
+  transition-delay: 1s;
+  transition: opacity 0.3s ease-in;
+}
+
+.fade-enter-from {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.fade-leave-to {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .sticker {
   position: fixed;
-  right: 20px;
+  right: 0px;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
-  background: linear-gradient(135deg, #fff 0%, $secondary-color 100%);
-  border-radius: 25px;
+  justify-content: space-between;
+  flex-direction: column;
+  height: 260px;
+  background: $secondary-color;
+  border-top-left-radius: 25px;
+  border-bottom-left-radius: 25px;
   padding: 15px;
   box-shadow: 0 8px 32px $shadow-secondary-color;
   transition: all 0.4s;
   z-index: 300;
   overflow: hidden;
   cursor: pointer;
+  transition: all 0.8s;
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    visibility: hidden;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    text-align: center;
+    max-width: 160px;
+    transition: opacity 0s ease-in 0s, opacity 0.4s ease-out 0s;
+  }
 
+  svg {
+    transition: all 0.6s;
+  }
   &--expanded {
-    .sticker__icon {
-      transform: scale(1.1) rotate(10deg);
-    }
-  }
-  &__icon {
-    transition: transform 0.4s ease;
-    flex-shrink: 0;
-    width: 80px;
-    height: 80px;
-  }
+    max-width: 250px;
 
-  &__content {
-    transform: translateX(0);
-    width: 250px;
-    margin-left: 0;
-    overflow: hidden;
-    height: fit-content;
-    margin-left: 15px;
     h3 {
-      font-size: 1.1rem;
-      margin-bottom: 0.5rem;
-      font-weight: 600;
+      visibility: visible;
+      width: fit-content;
+      height: fit-content;
+      opacity: 1;
     }
-
-    p {
-      font-size: 0.9rem;
-      margin-bottom: 1rem;
-      line-height: 1.4;
+    .image-grid-stack {
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 1fr;
+      overflow: hidden;
+      width: calc($img-size * 3 - (2 * $img-bias));
+      height: fit-content;
+      img {
+        @for $i from 1 through 3 {
+          &:nth-child(#{$i}) {
+            grid-row: 1;
+            grid-column: #{$i};
+            transform: translateY(0) translateX(#{-$img-bias * ($i - 1)});
+          }
+        }
+      }
+    }
+  }
+}
+.image-grid-stack {
+  display: grid;
+  width: fit-content;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(3, 1fr);
+  align-items: center;
+  justify-items: center;
+  margin: 0 auto;
+  height: calc($img-size * 3 - (2 * $img-bias));
+  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  img {
+    width: $img-size;
+    height: $img-size;
+    border: 4px solid $secondary-color;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    object-fit: cover;
+    grid-row: 1;
+    transition: all 0.6s ease;
+    &:hover {
+      transform: scale(1.1) translateY(-5px);
+      z-index: 10;
+    }
+    @for $i from 1 through 3 {
+      &:nth-child(#{$i}) {
+        grid-row: #{$i};
+        z-index: #{$i};
+        transform: translateY(#{-$img-bias * ($i - 1)});
+      }
     }
   }
 }
 
 @media (max-width: 768px) {
   .sticker {
-    right: 10px;
     padding: 12px;
 
     &--expanded {
-      .sticker__content {
-        width: 150px;
-      }
     }
-    &__icon {
-      width: 50px;
-      height: 50px;
-    }
-    &__content {
-      width: 150px;
-      h3 {
-        font-size: 1rem;
-      }
 
-      p {
-        font-size: 0.8rem;
-      }
+    h3 {
+      font-size: 1rem;
     }
   }
 }

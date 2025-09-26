@@ -1,8 +1,8 @@
 export const useModal = () => {
-  const isModalVisible = ref(false);
-  const modalText = ref("");
-  const modalTitle = ref("");
-  const showModalButtons = ref(false);
+  const isModalVisible = ref<boolean>(false);
+  const modalText = ref<string>("");
+  const modalTitle = ref<string>("");
+  const showModalButtons = ref<boolean>(false);
 
   const showModal = (
     text: string,

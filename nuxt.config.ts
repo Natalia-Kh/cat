@@ -5,6 +5,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   modules: ["vue3-carousel-nuxt"],
+
   app: {
     head: {
       charset: "utf-8",

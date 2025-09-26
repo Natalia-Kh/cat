@@ -4,9 +4,6 @@
 
     <div class="content">
       <h1>Страница со стикером</h1>
-
-      <ImageCarousel :image-urls="images" :loading="loading" />
-
       <section
         v-for="section in sections"
         :key="section.id"
@@ -31,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-const { fetchRandomImages, images, loading } = useImages();
 const { isModalVisible, showModal, modalText, modalTitle, showModalButtons } =
   useModal();
 
@@ -49,9 +45,6 @@ const showConfirmModal = () => {
     true
   );
 };
-onMounted(() => {
-  fetchRandomImages();
-});
 
 interface InfoType {
   id: number;
