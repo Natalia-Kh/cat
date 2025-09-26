@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="!pending"
+    v-if="!loading"
     ref="stickerrRef"
     class="sticker"
     :class="{ 'sticker--expanded ': isOpen }"
@@ -11,7 +11,7 @@
     <h3 v-show="isOpen">Консультация эксперта</h3>
     <div class="image-grid-stack">
       <img
-        v-for="(image, index) in data.images"
+        v-for="(image, index) in images"
         :key="index"
         :src="image"
         :alt="`Image ${index + 1}`"
@@ -44,12 +44,13 @@
 </template>
 
 <script setup lang="ts">
-const { fetchRandomImages } = useImages();
 const isOpen = ref(false);
 const stickerrRef = ref<HTMLElement | null>(null);
 const isMobile = ref(false);
 
-const { data, pending } = fetchRandomImages(3);
+const { images, loading } = useImages(3, {
+  immediate: true,
+});
 
 onMounted(() => {
   checkDeviceType();
