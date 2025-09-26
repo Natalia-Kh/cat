@@ -12,7 +12,7 @@
         </div>
 
         <div class="modal-footer" v-if="showButtons">
-          <button class="link link--color" @click="confirm">
+          <button class="link link--white" @click="confirm">
             {{ confirmText }}
           </button>
         </div>
@@ -156,7 +156,7 @@ onUnmounted(() => {
   &-content {
     padding: 20px;
     height: calc(100% - 156px);
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 
   &-footer {
@@ -165,7 +165,7 @@ onUnmounted(() => {
     gap: 12px;
     padding: 20px;
     border-top: 1px solid $secondary-color;
-    background-color: #f9fafb;
+    background-color: #eeeff0;
   }
 
   &-button {

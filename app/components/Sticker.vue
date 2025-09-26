@@ -9,7 +9,7 @@
     @mouseleave="handleMouseLeave"
   >
     <h3 v-show="isOpen">Консультация эксперта</h3>
-    <div class="image-grid-stack">
+    <div class="sticker-image-grid">
       <img
         v-for="(image, index) in images"
         :key="index"
@@ -18,15 +18,15 @@
         loading="lazy"
       />
     </div>
-    <transition name="fade">
+    <transition name="fade-link">
       <button
         v-show="isOpen"
         class="link link--white"
         @click="$emit('showConfirmModal')"
       >
         Получить консультацию
-      </button></transition
-    >
+      </button>
+    </transition>
     <svg
       v-show="!isOpen"
       width="24"
@@ -36,7 +36,7 @@
     >
       <path
         d="M20 12H4M4 12L10 18M4 12L10 6"
-        stroke="#285599"
+        stroke="#a7a8aa"
         stroke-width="2"
       />
     </svg>
@@ -95,8 +95,9 @@ const close = () => {
 </script>
 
 <style scoped lang="scss">
-$img-size: 80px;
-$img-bias: 24px;
+$img-count: 3;
+$img-size: 60px;
+$img-bias: 18px;
 
 .v-enter-active {
   transition: opacity 0.5s ease-out;
@@ -114,23 +115,31 @@ $img-bias: 24px;
 .v-enter-to {
   opacity: 1;
 }
-.fade-leave-active {
-  transition-duration: 0ms;
-  transition-timing-function: ease-out;
+.fade-link-leave-active {
+  transition: opacity 0s;
 }
-.fade-enter-active {
-  transition-delay: 1s;
-  transition: opacity 0.3s ease-in;
-}
-
-.fade-enter-from {
-  opacity: 0;
-  pointer-events: none;
+.fade-link-enter-active {
+  pointer-events: none !important;
+  transition: opacity 0.4s ease-in 0.1s;
 }
 
-.fade-leave-to {
-  opacity: 0;
-  pointer-events: none;
+.fade-link-enter-from {
+  opacity: 0 !important;
+}
+.fade-link-enter-to {
+  opacity: 1;
+}
+.fade-link-leave-to {
+  opacity: 0 !important;
+}
+
+@keyframes titleShow {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .sticker {
@@ -146,45 +155,38 @@ $img-bias: 24px;
   background: $secondary-color;
   border-top-left-radius: 25px;
   border-bottom-left-radius: 25px;
-  padding: 15px;
-  box-shadow: 0 8px 32px $shadow-secondary-color;
+  padding: 26px 4px;
+  box-shadow: 8px $shadow-secondary-color;
   transition: all 0.4s;
   z-index: 300;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.8s;
   h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    visibility: hidden;
-    width: 0;
-    height: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
     opacity: 0;
     text-align: center;
     max-width: 160px;
-    transition: opacity 0s ease-in 0s, opacity 0.4s ease-out 0s;
+    animation: titleShow 0.4s 0s ease-in both;
   }
 
   svg {
     transition: all 0.6s;
   }
-  &--expanded {
-    max-width: 250px;
 
-    h3 {
-      visibility: visible;
-      width: fit-content;
-      height: fit-content;
-      opacity: 1;
-    }
-    .image-grid-stack {
-      grid-template-columns: repeat(3, 1fr);
+  &--expanded {
+    max-width: 280px;
+    padding: 26px;
+
+    .sticker-image-grid {
+      grid-template-columns: repeat($img-count, 1fr);
       grid-template-rows: 1fr;
       overflow: hidden;
-      width: calc($img-size * 3 - (2 * $img-bias));
+      width: calc($img-size * $img-count - (2 * $img-bias));
       height: fit-content;
       img {
-        @for $i from 1 through 3 {
+        @for $i from 1 through $img-count {
           &:nth-child(#{$i}) {
             grid-row: 1;
             grid-column: #{$i};
@@ -194,35 +196,31 @@ $img-bias: 24px;
       }
     }
   }
-}
-.image-grid-stack {
-  display: grid;
-  width: fit-content;
-  grid-template-columns: 1fr;
-  grid-template-rows: repeat(3, 1fr);
-  align-items: center;
-  justify-items: center;
-  margin: 0 auto;
-  height: calc($img-size * 3 - (2 * $img-bias));
-  transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  img {
-    width: $img-size;
-    height: $img-size;
-    border: 4px solid $secondary-color;
-    border-radius: 16px;
-    transition: all 0.3s ease;
-    object-fit: cover;
-    grid-row: 1;
-    transition: all 0.6s ease;
-    &:hover {
-      transform: scale(1.1) translateY(-5px);
-      z-index: 10;
-    }
-    @for $i from 1 through 3 {
-      &:nth-child(#{$i}) {
-        grid-row: #{$i};
-        z-index: #{$i};
-        transform: translateY(#{-$img-bias * ($i - 1)});
+  &-image-grid {
+    display: grid;
+    width: fit-content;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat($img-count, 1fr);
+    align-items: center;
+    justify-items: center;
+    margin: 0 auto;
+    height: calc($img-size * $img-count - (2 * $img-bias));
+    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    img {
+      width: $img-size;
+      height: $img-size;
+      border: 4px solid $secondary-color;
+      border-radius: 16px;
+      transition: all 0.3s ease;
+      object-fit: cover;
+      grid-row: 1;
+      transition: all 0.6s ease;
+      @for $i from 1 through $img-count {
+        &:nth-child(#{$i}) {
+          grid-row: #{$i};
+          z-index: #{$i};
+          transform: translateY(#{-$img-bias * ($i - 1)});
+        }
       }
     }
   }
@@ -230,11 +228,6 @@ $img-bias: 24px;
 
 @media (max-width: 768px) {
   .sticker {
-    padding: 12px;
-
-    &--expanded {
-    }
-
     h3 {
       font-size: 1rem;
     }
