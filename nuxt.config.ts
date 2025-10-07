@@ -4,7 +4,7 @@ import svgLoader from "vite-svg-loader";
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
-  modules: ["vue3-carousel-nuxt", "@nuxt/image", "@pinia/nuxt"],
+  modules: ["vue3-carousel-nuxt", "@nuxt/image", "@pinia/nuxt", "nuxt-svgo"],
 
   app: {
     head: {
