@@ -4,3 +4,8 @@ export const COMPONENT_NAMES = {
 
 export type ComponentName =
   (typeof COMPONENT_NAMES)[keyof typeof COMPONENT_NAMES];
+
+export enum DirectionType {
+  LEFT,
+  RIGHT,
+}
