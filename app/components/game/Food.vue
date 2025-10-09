@@ -46,8 +46,8 @@ const foodEmoji = computed(() => {
 <style scoped lang="scss">
 .food {
   position: absolute;
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   transition: all 0.1s linear;
   animation: float 2s ease-in-out infinite;
   z-index: 10;
@@ -84,7 +84,7 @@ const foodEmoji = computed(() => {
     opacity: 1;
   }
   100% {
-    transform: scale(0) translateY(20px);
+    transform: scale(0) translateY(10px);
     opacity: 0;
   }
 }

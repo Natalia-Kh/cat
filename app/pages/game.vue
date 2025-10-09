@@ -197,7 +197,7 @@ const startFoodGeneration = () => {
     };
 
     foods.value.push(newFood);
-  }, 1200 - level.value * 100);
+  }, 1000 - level.value * 100);
 };
 
 const startGameLoop = () => {
@@ -208,9 +208,9 @@ const startGameLoop = () => {
 
     foods.value.forEach((food) => {
       if (!food.caught) {
-        food.y += 2 + level.value * 0.2;
+        food.y += 2 + level.value * 0.1;
 
-        if (food.y >= 75 && !food.caught) {
+        if (food.y >= 80 && !food.caught) {
           const bowlLeft = bowlPosition.x - 5;
           const bowlRight = bowlPosition.x + 5;
 
@@ -235,7 +235,7 @@ const startGameLoop = () => {
     });
 
     foods.value = foods.value.filter((food) => !food.caught || food.y < 100);
-  }, 16);
+  }, 20);
 };
 
 const feedCat = async () => {
