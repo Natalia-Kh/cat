@@ -36,7 +36,15 @@
         </div>
       </div>
 
-      <div class="game-area" @mousemove="moveBowl" @touchmove="moveBowlTouch">
+      <div
+        class="game-area"
+        role="application"
+        aria-label="Игровая область для кормления кота"
+        tabindex="0"
+        @mousemove="moveBowl"
+        @touchmove="moveBowlTouch"
+        @keydown="handleKeyboard"
+      >
         <GameCat
           :size="catSize"
           :isFeeding="isFeeding"
@@ -76,62 +84,50 @@
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from "pinia";
+import { useGameStore } from "~/stores/game";
+import { useGameLoop, useFoodGenerator } from "~/composables/useGameLoop";
+import { useErrorHandler } from "~/composables/useErrorHandler";
+
 definePageMeta({
   layout: false,
 });
 
-import { type FoodItem, type Position, FoodType } from "~/types/game";
+const gameStore = useGameStore();
+const {
+  start: startGameLoop,
+  stop: stopGameLoop,
+  pause: pauseGameLoop,
+  resume: resumeGameLoop,
+} = useGameLoop();
+const { startGeneration, stopGeneration, restartGeneration } =
+  useFoodGenerator();
+const { addError } = useErrorHandler();
 
-const isPlaying = ref(false);
-const isFeeding = ref(false);
-const isLevelComplete = ref(false);
-const level = ref(1);
-const score = ref(0);
-const catSize = ref(1);
-const isTabActive = ref(true);
-const bowlPosition = reactive<Position>({ x: 50, y: 80 });
-
-const foods = ref<FoodItem[]>([]);
-let foodIdCounter = 0;
-
-const targetScore = computed(() => {
-  switch (level.value) {
-    case 1:
-      return 3;
-    case 2:
-      return 5;
-    case 3:
-      return 7;
-    default:
-      return 0;
-  }
-});
-
-const progressPercentage = computed(() => {
-  return (score.value / targetScore.value) * 100;
-});
-const isFinish = computed(() => {
-  return level.value > 3;
-});
-const rightIndentCat = computed(() => {
-  if (catSize.value == 1) return "2%";
-  else if (catSize.value > 1.5) return `${7 * catSize.value}%`;
-  else return `${5 * catSize.value}%`;
-});
-
-let foodTimer: ReturnType<typeof setInterval> | null = null;
-let gameLoop: ReturnType<typeof setInterval> | null = null;
+// Computed properties из store
+const {
+  score,
+  level,
+  isPlaying,
+  isFeeding,
+  isLevelComplete,
+  targetScore,
+  catSize,
+  foods,
+  bowlPosition,
+  progressPercentage,
+  isGameFinished: isFinish,
+  rightIndentCat,
+} = storeToRefs(gameStore);
 
 const startGame = () => {
-  isPlaying.value = true;
-  score.value = 0;
-  level.value = 1;
-  catSize.value = 1;
-  foods.value = [];
-  isLevelComplete.value = false;
-
-  startFoodGeneration();
-  startGameLoop();
+  try {
+    gameStore.startGame();
+    startGameLoop();
+    startGeneration();
+  } catch (error) {
+    addError(error, "Failed to start game");
+  }
 };
 
 const restartGame = () => {
@@ -139,28 +135,22 @@ const restartGame = () => {
 };
 
 const handleVisibilityChange = () => {
-  isTabActive.value = !document.hidden;
+  const isTabActive = !document.hidden;
+  gameStore.setTabActive(isTabActive);
 
-  if (!isTabActive.value) {
-    stopFoodGeneration();
+  if (!isTabActive) {
+    pauseGameLoop();
+    stopGeneration();
   } else if (isPlaying.value && !isFeeding.value) {
-    startFoodGeneration();
-  }
-};
-
-const stopFoodGeneration = () => {
-  if (foodTimer) {
-    clearInterval(foodTimer);
-    foodTimer = null;
+    resumeGameLoop();
+    restartGeneration();
   }
 };
 
 const moveBowl = (event: MouseEvent) => {
   if (!isPlaying.value) return;
-  bowlPosition.x = getBowlPositionX(
-    event.clientX,
-    event.currentTarget as HTMLElement
-  );
+  const x = getBowlPositionX(event.clientX, event.currentTarget as HTMLElement);
+  gameStore.moveBowl({ x, y: bowlPosition.value.y });
 };
 
 const moveBowlTouch = (event: TouchEvent) => {
@@ -168,10 +158,8 @@ const moveBowlTouch = (event: TouchEvent) => {
   event.preventDefault();
   const touch = event.touches[0];
   if (!touch) return;
-  bowlPosition.x = getBowlPositionX(
-    touch.clientX,
-    event.currentTarget as HTMLElement
-  );
+  const x = getBowlPositionX(touch.clientX, event.currentTarget as HTMLElement);
+  gameStore.moveBowl({ x, y: bowlPosition.value.y });
 };
 
 const getBowlPositionX = (clientX: number, gameArea: HTMLElement) => {
@@ -180,91 +168,64 @@ const getBowlPositionX = (clientX: number, gameArea: HTMLElement) => {
   return Math.max(10, Math.min(90, x));
 };
 
-const startFoodGeneration = () => {
-  if (foodTimer) clearInterval(foodTimer);
+const handleKeyboard = (event: KeyboardEvent) => {
+  if (!isPlaying.value) return;
 
-  foodTimer = setInterval(() => {
-    if (!isPlaying.value || isFeeding.value) return;
+  const step = 5; // Шаг движения миски
 
-    const newFood: FoodItem = {
-      id: foodIdCounter++,
-      x: Math.random() * 80 + 10,
-      y: 0,
-      type: [FoodType.FISH, FoodType.MEAT, FoodType.PIZZA, FoodType.CHEESE][
-        Math.floor(Math.random() * 4)
-      ] as FoodType,
-      caught: false,
-    };
-
-    foods.value.push(newFood);
-  }, 1000 - level.value * 100);
-};
-
-const startGameLoop = () => {
-  if (gameLoop) clearInterval(gameLoop);
-
-  gameLoop = setInterval(() => {
-    if (!isPlaying.value || isFeeding.value) return;
-
-    foods.value.forEach((food) => {
-      if (!food.caught) {
-        food.y += 2 + level.value * 0.1;
-
-        if (food.y >= 80 && !food.caught) {
-          const bowlLeft = bowlPosition.x - 5;
-          const bowlRight = bowlPosition.x + 5;
-
-          if (food.x >= bowlLeft && food.x <= bowlRight) {
-            food.caught = true;
-            score.value++;
-
-            if (score.value >= targetScore.value) {
-              isLevelComplete.value = true;
-              if (foodTimer) clearInterval(foodTimer);
-            }
-          }
-        }
-
-        if (food.y > 100 && !food.caught) {
-          const index = foods.value.indexOf(food);
-          if (index > -1) {
-            foods.value.splice(index, 1);
-          }
-        }
+  switch (event.key) {
+    case "ArrowLeft":
+    case "a":
+    case "A":
+      event.preventDefault();
+      gameStore.moveBowl({
+        x: Math.max(10, bowlPosition.value.x - step),
+        y: bowlPosition.value.y,
+      });
+      break;
+    case "ArrowRight":
+    case "d":
+    case "D":
+      event.preventDefault();
+      gameStore.moveBowl({
+        x: Math.min(90, bowlPosition.value.x + step),
+        y: bowlPosition.value.y,
+      });
+      break;
+    case " ":
+    case "Enter":
+      event.preventDefault();
+      if (isLevelComplete.value) {
+        feedCat();
       }
-    });
-
-    foods.value = foods.value.filter((food) => !food.caught || food.y < 100);
-  }, 20);
+      break;
+  }
 };
 
 const feedCat = async () => {
-  isFeeding.value = true;
-  isLevelComplete.value = false;
+  try {
+    pauseGameLoop();
+    stopGeneration();
+    await gameStore.feedCat();
 
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  catSize.value += 0.3;
-  level.value++;
-  score.value = 0;
-  foods.value = [];
-  isFeeding.value = false;
-
-  if (level.value <= 3) {
-    startFoodGeneration();
+    if (level.value <= 3) {
+      resumeGameLoop();
+      restartGeneration();
+    }
+  } catch (error) {
+    addError(error, "Failed to feed cat");
   }
 };
 
 onMounted(() => {
   document.addEventListener("visibilitychange", handleVisibilityChange);
-
-  isTabActive.value = !document.hidden;
+  gameStore.setTabActive(!document.hidden);
 });
+
 onUnmounted(() => {
   document.removeEventListener("visibilitychange", handleVisibilityChange);
-
-  stopFoodGeneration();
-  if (gameLoop) clearInterval(gameLoop);
+  stopGameLoop();
+  stopGeneration();
 });
 </script>
 
@@ -399,21 +360,77 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  .game-container {
-    padding: 10px;
-  }
+  .game {
+    &-container {
+      padding: 10px;
+    }
 
-  .game-area {
-    height: 400px;
-  }
+    &-area {
+      height: 60vh;
+      min-height: 300px;
+      touch-action: pan-x; // Разрешить только горизонтальную прокрутку
 
-  .game-header h1 {
-    font-size: 2em;
+      &:active {
+        cursor: grabbing;
+      }
+    }
+
+    &-header {
+      flex-direction: column;
+      gap: 1rem;
+
+      h1 {
+        font-size: 2em;
+        text-align: center;
+      }
+
+      &-stats {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+      }
+    }
+
+    &-controls {
+      flex-direction: column;
+      gap: 1rem;
+      height: auto;
+      min-height: 72px;
+    }
   }
 
   .btn {
     padding: 12px 24px;
     font-size: 1.1em;
+    min-height: 44px; // Минимальный размер для touch
+    touch-action: manipulation; // Отключить двойной тап
+  }
+
+  .progress-bar {
+    margin-bottom: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .game {
+    &-area {
+      height: 50vh;
+      min-height: 250px;
+    }
+
+    &-header h1 {
+      font-size: 1.5em;
+    }
+
+    &-stats .stat {
+      padding: 8px 16px;
+      font-size: 1em;
+    }
+  }
+
+  .btn {
+    padding: 10px 20px;
+    font-size: 1em;
   }
 }
 </style>

@@ -1,10 +1,17 @@
 <template>
   <Carousel v-bind="carouselConfig" class="image-carousel">
-    <Slide v-for="(value, index) in imageUrls" :key="index" class="image-item">
+    <Slide v-for="(value, index) in props.imageUrls" :key="index" class="image-item">
       <Placeholder v-if="!isLoaded" class="image-loader" />
       <NuxtImg
         :src="value"
-        @load="isLoaded = true"
+        :alt="`Изображение кота ${index + 1}`"
+        loading="lazy"
+        placeholder
+        :sizes="'400px'"
+        format="webp"
+        quality="80"
+        @load="handleImageLoad"
+        @error="handleImageErrorEvent"
         :class="{ 'image-hidden': !isLoaded }"
       />
     </Slide>
@@ -17,14 +24,29 @@
 <script setup lang="ts">
 import "vue3-carousel/carousel.css";
 import { Carousel, Slide, Pagination } from "vue3-carousel";
+import { useImageErrorHandler } from "~/composables/useErrorHandler";
 
 interface CarouselProps {
   imageUrls: string[];
 }
+
+const props = defineProps<CarouselProps>();
 const isLoaded = ref(false);
-const { imageUrls } = defineProps<CarouselProps>();
+const { handleImageError, getFallbackImage } = useImageErrorHandler();
+
 const carouselConfig = {
   itemsToShow: 1,
+  wrapAround: true,
+  snapAlign: "center",
+};
+
+const handleImageLoad = () => {
+  isLoaded.value = true;
+};
+
+const handleImageErrorEvent = (event: Event) => {
+  const target = event.target as HTMLImageElement;
+  handleImageError(new Error('Failed to load image'), target.src);
 };
 </script>
 

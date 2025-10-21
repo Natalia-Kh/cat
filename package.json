@@ -6,8 +6,7 @@
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "preview": "nuxt preview"
   },
   "dependencies": {
     "@nuxt/image": "^1.11.0",
@@ -20,6 +19,7 @@
     "vue3-carousel-nuxt": "^1.1.6"
   },
   "devDependencies": {
+    "jsdom": "^25.0.1",
     "sass": "^1.92.1",
     "vite-svg-loader": "^5.1.0"
   }

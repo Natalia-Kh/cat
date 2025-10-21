@@ -37,6 +37,8 @@ const foodEmoji = computed(() => {
       return Meat;
     case FoodType.PIZZA:
       return Pizza;
+    case FoodType.CHEESE:
+      return Cheese;
     default:
       return Cheese;
   }

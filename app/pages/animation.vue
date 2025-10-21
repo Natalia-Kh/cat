@@ -153,7 +153,6 @@ const pauseOnHover = ref(true);
 
 @media (max-width: 768px) {
   .animation {
-    padding: 1rem;
     &-title {
       font-size: 2rem;
     }

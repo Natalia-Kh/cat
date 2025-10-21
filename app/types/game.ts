@@ -1,8 +1,8 @@
 export enum FoodType {
-  FISH,
-  MEAT,
-  PIZZA,
-  CHEESE,
+  FISH = 'fish',
+  MEAT = 'meat',
+  PIZZA = 'pizza',
+  CHEESE = 'cheese',
 }
 
 export interface Position {
@@ -16,6 +16,8 @@ export interface FoodItem {
   y: number;
   type: FoodType;
   caught: boolean;
+  speed?: number;
+  rotation?: number;
 }
 
 export interface GameState {
@@ -27,3 +29,33 @@ export interface GameState {
   targetScore: number;
   catSize: number;
 }
+
+export interface GameConfig {
+  levels: LevelConfig[];
+  difficulty: 'easy' | 'medium' | 'hard';
+}
+
+export interface LevelConfig {
+  targetScore: number;
+  foodSpeed: number;
+  spawnRate: number;
+  catGrowth: number;
+  maxFoods?: number;
+}
+
+export interface GameStats {
+  totalScore: number;
+  levelsCompleted: number;
+  bestScore: number;
+  playTime: number;
+}
+
+export type GameEvent = 
+  | 'game_start'
+  | 'game_pause'
+  | 'game_resume'
+  | 'level_complete'
+  | 'game_complete'
+  | 'food_caught'
+  | 'food_missed'
+  | 'cat_fed';

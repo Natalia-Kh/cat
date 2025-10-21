@@ -3,6 +3,7 @@
     <NuxtLayout>
       <NuxtPage />
       <Modal />
+      <ErrorDisplay />
     </NuxtLayout>
   </div>
 </template>
