@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { FoodItem, Position, GameState } from "~/types/game";
+import type { FoodItem, Position, GameState } from "@/types/game";
 
 export interface GameConfig {
   levels: {

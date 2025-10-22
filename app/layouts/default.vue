@@ -14,7 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import { useModalStore } from "~/stores/modal";
 import { COMPONENT_NAMES } from "@/types/index";
 
 const modalStore = useModalStore();

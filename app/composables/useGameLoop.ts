@@ -1,4 +1,3 @@
-import { ref, onMounted, onUnmounted, watch } from "vue";
 import { useGameStore } from "~/stores/game";
 import { type FoodItem, FoodType } from "~/types/game";
 
@@ -69,10 +68,6 @@ export const useGameLoop = () => {
     }
   };
 
-  const pause = () => {
-    stop();
-  };
-
   const resume = () => {
     if (gameStore.isPlaying && !gameStore.isFeeding) {
       start();
@@ -87,7 +82,6 @@ export const useGameLoop = () => {
   return {
     start,
     stop,
-    pause,
     resume,
     isRunning: readonly(isRunning),
   };

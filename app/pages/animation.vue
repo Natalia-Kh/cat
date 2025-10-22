@@ -49,7 +49,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
 import { DirectionType } from "@/types/index";
 definePageMeta({
   layout: false,

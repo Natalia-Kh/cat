@@ -1,18 +1,22 @@
 <template>
   <Carousel v-bind="carouselConfig" class="image-carousel">
-    <Slide v-for="(value, index) in props.imageUrls" :key="index" class="image-item">
-      <Placeholder v-if="!isLoaded" class="image-loader" />
+    <Slide
+      v-for="(value, index) in props.imageUrls"
+      :key="index"
+      class="image-item"
+    >
+      <Placeholder v-if="!isImageLoaded(index)" class="image-loader" />
       <NuxtImg
         :src="value"
         :alt="`Изображение кота ${index + 1}`"
-        loading="lazy"
         placeholder
         :sizes="'400px'"
         format="webp"
         quality="80"
-        @load="handleImageLoad"
         @error="handleImageErrorEvent"
-        :class="{ 'image-hidden': !isLoaded }"
+        :loading="index === 0 ? 'eager' : 'lazy'"
+        @load="handleImageLoad(index)"
+        :class="{ 'image-hidden': !isImageLoaded(index) }"
       />
     </Slide>
     <template #addons>
@@ -24,15 +28,13 @@
 <script setup lang="ts">
 import "vue3-carousel/carousel.css";
 import { Carousel, Slide, Pagination } from "vue3-carousel";
-import { useImageErrorHandler } from "~/composables/useErrorHandler";
 
 interface CarouselProps {
   imageUrls: string[];
 }
 
 const props = defineProps<CarouselProps>();
-const isLoaded = ref(false);
-const { handleImageError, getFallbackImage } = useImageErrorHandler();
+const { handleImageError } = useImageErrorHandler();
 
 const carouselConfig = {
   itemsToShow: 1,
@@ -40,13 +42,17 @@ const carouselConfig = {
   snapAlign: "center",
 };
 
-const handleImageLoad = () => {
-  isLoaded.value = true;
+const loadedImages = ref(new Set<number>());
+
+const handleImageLoad = (index: number) => {
+  loadedImages.value.add(index);
 };
+
+const isImageLoaded = (index: number) => loadedImages.value.has(index);
 
 const handleImageErrorEvent = (event: Event) => {
   const target = event.target as HTMLImageElement;
-  handleImageError(new Error('Failed to load image'), target.src);
+  handleImageError(new Error("Failed to load image"), target.src);
 };
 </script>
 

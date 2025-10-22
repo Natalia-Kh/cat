@@ -85,9 +85,6 @@
 
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { useGameStore } from "~/stores/game";
-import { useGameLoop, useFoodGenerator } from "~/composables/useGameLoop";
-import { useErrorHandler } from "~/composables/useErrorHandler";
 
 definePageMeta({
   layout: false,
@@ -97,14 +94,12 @@ const gameStore = useGameStore();
 const {
   start: startGameLoop,
   stop: stopGameLoop,
-  pause: pauseGameLoop,
   resume: resumeGameLoop,
 } = useGameLoop();
 const { startGeneration, stopGeneration, restartGeneration } =
   useFoodGenerator();
 const { addError } = useErrorHandler();
 
-// Computed properties из store
 const {
   score,
   level,
@@ -139,7 +134,7 @@ const handleVisibilityChange = () => {
   gameStore.setTabActive(isTabActive);
 
   if (!isTabActive) {
-    pauseGameLoop();
+    stopGameLoop();
     stopGeneration();
   } else if (isPlaying.value && !isFeeding.value) {
     resumeGameLoop();
@@ -204,7 +199,7 @@ const handleKeyboard = (event: KeyboardEvent) => {
 
 const feedCat = async () => {
   try {
-    pauseGameLoop();
+    stopGameLoop();
     stopGeneration();
     await gameStore.feedCat();
 

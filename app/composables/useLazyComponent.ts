@@ -1,5 +1,3 @@
-import { shallowRef, ref } from "vue";
-import type { Component } from "vue";
 import { type ComponentName, COMPONENT_NAMES } from "@/types/index";
 
 export function useLazyComponent() {

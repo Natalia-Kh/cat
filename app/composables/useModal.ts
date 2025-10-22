@@ -1,7 +1,8 @@
 import { useModalStore } from "@/stores/modal";
-import { storeToRefs } from "pinia";
 import { useScroll } from "@/composables/useScroll";
+
 const { lock, unlock } = useScroll();
+
 export function useModal() {
   const modalStore = useModalStore();
 

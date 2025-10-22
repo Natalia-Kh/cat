@@ -20,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-import { useModalStore } from "~/stores/modal";
 const modalStore = useModalStore();
 
 const imageUrls = [
